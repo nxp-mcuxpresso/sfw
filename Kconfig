@@ -1,0 +1,2 @@
+source "$SFW_DIR/firmware/Kconfig"
+source "$SFW_DIR/component/Kconfig"

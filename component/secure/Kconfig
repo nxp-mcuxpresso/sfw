@@ -1,0 +1,24 @@
+menu "secure"
+    menuconfig COMPONENT_MCUBOOT_SECURE
+        if SOC_IMXRTYYYY_SERIES
+            config CONFIG_BOOT_ENCRYPTED_XIP
+                bool "Encrypted XIP function"
+                default n
+                help
+                    Use encrypted application image.
+        endif
+            
+        config COMPONENT_MBEDTLS
+            bool "enable mbedtls"
+            default y
+            help
+                enable mbedtls.
+		
+    	if COMPONENT_MBEDTLS
+    	    config SFW_MBEDTLS_CONFIG_FILE
+    	        string "Set mbedtls config file"
+    	        default "ksdk_mbedtls_config.h"
+    	        help
+    	            Set the specific mbedtls config file.
+    	endif
+endmenu

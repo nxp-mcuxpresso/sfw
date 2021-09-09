@@ -1,0 +1,23 @@
+from building import *
+
+cwd = GetCurrentDir()
+
+# add the general drivers.
+src = Glob('*.c')
+src += Glob('core/*.c')
+src += Glob('core/sysdep/*.c')
+src += Glob('core/utils/*.c')
+src += Glob('ota/*.c')
+
+
+
+CPPPATH = [cwd, 
+           cwd + '/core',
+           cwd + '/core/sysdep',
+           cwd + '/core/utils',
+           cwd + '/ota',]
+
+
+group = DefineGroup('Aliyun_ota', src, depend = ['OTA_ALIYUN'], CPPPATH = CPPPATH)
+
+Return('group')

@@ -1,0 +1,34 @@
+from building import *
+
+# The set of source files associated with this SConscript file.
+src = Split('''
+host/class/usb_host_hub.c
+host/class/usb_host_hub_app.c
+host/class/usb_host_msd.c
+host/class/usb_host_msd_ufi.c
+host/usb_host_devices.c
+host/usb_host_framework.c
+host/usb_host_hci.c
+phy/usb_phy.c
+osa/usb_osa_freertos.c
+''')
+cwd = GetCurrentDir()
+CPPPATH = [cwd,
+           cwd + "/include",
+           cwd + "/osa",
+           cwd + "/host",
+           cwd + "/host/class",
+           cwd + "/phy"]
+
+if GetDepend(['SOC_IMXRTYYYY_SERIES']):
+    src.append('host/usb_host_ehci.c')
+
+if GetDepend(['SOC_IMXRTXXX_SERIES']):
+    src.append('host/usb_host_ip3516hs.c')
+
+if GetDepend(['SOC_LPC_SERIES']):
+    src.append('host/usb_host_ohci.c')
+
+group = DefineGroup('usb', src, depend = ['COMPONENT_USB'], CPPPATH = CPPPATH)
+
+Return('group')

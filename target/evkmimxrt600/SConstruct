@@ -1,0 +1,53 @@
+import os
+import sys
+import shutil
+import sfwprofile
+
+if os.getenv('SFW_ROOT'):
+    SFW_ROOT = os.getenv('SFW_ROOT')
+else:
+    SFW_ROOT = os.path.normpath(os.getcwd() + '/../..')
+
+sys.path = sys.path + [os.path.join(SFW_ROOT, 'tools')]
+try:
+    from building import *
+except:
+    print('Cannot found SFW root directory, please check SFW_ROOT')
+    print(SFW_ROOT)
+    exit(-1)
+
+TARGET = 'sfw.' + sfwprofile.TARGET_EXT
+DefaultEnvironment(tools=[])
+if sfwprofile.PLATFORM == 'armcc':
+    env = Environment(tools = ['mingw'],
+        AS = sfwprofile.AS, ASFLAGS = sfwprofile.AFLAGS,
+        CC = sfwprofile.CC, CCFLAGS = sfwprofile.CFLAGS,
+        CXX = sfwprofile.CXX, CXXFLAGS = sfwprofile.CXXFLAGS,
+        AR = sfwprofile.AR, ARFLAGS = '-rc',
+        LINK = sfwprofile.LINK, LINKFLAGS = sfwprofile.LFLAGS,
+        # overwrite cflags, because cflags has '--C99'
+        CXXCOM = '$CXX -o $TARGET --cpp -c $CXXFLAGS $_CCCOMCOM $SOURCES')
+else:
+    env = Environment(tools = ['mingw'],
+        AS = sfwprofile.AS, ASFLAGS = sfwprofile.AFLAGS,
+        CC = sfwprofile.CC, CCFLAGS = sfwprofile.CFLAGS,
+        CXX = sfwprofile.CXX, CXXFLAGS = sfwprofile.CXXFLAGS,
+        AR = sfwprofile.AR, ARFLAGS = '-rc',
+        LINK = sfwprofile.LINK, LINKFLAGS = sfwprofile.LFLAGS,
+        CXXCOM = '$CXX -o $TARGET -c $CXXFLAGS $_CCCOMCOM $SOURCES')
+
+env.PrependENVPath('PATH', sfwprofile.EXEC_PATH)
+
+if sfwprofile.PLATFORM == 'iar':
+    env.Replace(CCCOM = ['$CC $CCFLAGS $CPPFLAGS $_CPPDEFFLAGS $_CPPINCFLAGS -o $TARGET $SOURCES'])
+    env.Replace(ARFLAGS = [''])
+    env.Replace(LINKCOM = env["LINKCOM"] + ' --map sfw.map')
+
+Export('SFW_ROOT')
+Export('sfwprofile')
+
+# prepare building environment
+objs = PrepareBuilding(env, SFW_ROOT, has_libcpu=False)
+
+# make a building
+DoBuilding(TARGET, objs)

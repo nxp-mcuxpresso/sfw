@@ -1,0 +1,41 @@
+from building import *
+
+# The set of source files associated with this SConscript file.
+src = Split('''
+''')
+
+if GetDepend(['SOC_IMXRTYYYY_SERIES']):
+    cwd = GetCurrentDir()
+    CPPPATH = [cwd + "/common", cwd + "/host", cwd + "/osa", cwd + "/sd"]
+    src.append('common/fsl_sdmmc_common.c')
+    src.append('host/usdhc/non_blocking/fsl_sdmmc_host.c')
+    src.append('osa/fsl_sdmmc_osa.c')
+    src.append('sd/fsl_sd.c')
+
+if GetDepend(['SOC_IMXRT500_SERIES']):
+    cwd = GetCurrentDir()
+    CPPPATH = [cwd + "/common/sdthree", cwd + "/host/sdthree", cwd + "/osa/sdthree", cwd + "/sd/sdthree"]
+    src.append('common/sdthree/fsl_sdmmc_common.c')     
+    src.append('host/sdthree/non_blocking/fsl_sdmmc_host.c')
+    src.append('osa/sdthree/fsl_sdmmc_osa.c')
+    src.append('sd/sdthree/fsl_sd.c')
+  
+if GetDepend(['SOC_IMXRT600_SERIES']):
+    cwd = GetCurrentDir()
+    CPPPATH = [cwd + "/common", cwd + "/host", cwd + "/osa", cwd + "/sd"]
+    src.append('common/fsl_sdmmc_common.c')
+    src.append('host/usdhc/non_blocking/fsl_sdmmc_host.c')
+    src.append('osa/fsl_sdmmc_osa.c')
+    src.append('sd/fsl_sd.c')
+  
+if GetDepend(['SOC_LPC_SERIES']):
+    cwd = GetCurrentDir()
+    CPPPATH = [cwd + "/common", cwd + "/host", cwd + "/osa", cwd + "/sd"]
+    src.append('common/fsl_sdmmc_common.c')
+    src.append('host/sdif/non_blocking/fsl_sdmmc_host.c')
+    src.append('osa/fsl_sdmmc_osa.c')
+    src.append('sd/fsl_sd.c')
+    
+group = DefineGroup('sdmmc', src, depend = ['COMPONENT_SDMMC'], CPPPATH = CPPPATH)
+
+Return('group')

@@ -1,0 +1,33 @@
+*.pyc
+*.map
+*.dblite
+*.elf
+*.bin
+*.hex
+*.axf
+*.pdb
+*.idb
+*.ilk
+*.old
+*.history
+build
+Debug
+documentation/html
+*~
+*.o
+*.obj
+*.bak
+*.dep
+*.i
+*.d
+tools/kconfig-frontends/kconfig-mconf
+GPUCache
+*cpp.ld
+
+#cscope files
+cscope.*
+ncscope.*
+
+#ctag files
+tags
+

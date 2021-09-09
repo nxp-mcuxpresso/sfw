@@ -1,0 +1,21 @@
+from building import *
+
+# The set of source files associated with this SConscript file.
+src = Glob('port/*.c')
+src += Glob('src/api/*.c')
+src += Glob('src/core/*.c')
+src += Glob('src/core/ipv4/*.c')
+src += Glob('src/core/ipv6/*.c')
+src += Glob('src/netif/*.c')
+src += Glob('src/netif/ppp/*.c')
+
+cwd = GetCurrentDir()
+CPPPATH = [cwd + "/port", 
+           cwd + "/src",
+           cwd + "/src/include",
+		   cwd + "/src/include/compat/posix",
+		   cwd + "/src/include/compat/stdc"]
+
+group = DefineGroup('lwip', src, depend = ['OTA_CLOUD'], CPPPATH = CPPPATH)
+
+Return('group')

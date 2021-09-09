@@ -1,0 +1,12 @@
+menu "udisk updating mode"
+
+config COMPONENT_USB
+    bool "Enable udisk updating mode"
+    default n
+    select COMPONENT_OSA
+    help
+        Enable udisk updating mode.
+
+config COMPONENT_OSA
+    bool
+endmenu

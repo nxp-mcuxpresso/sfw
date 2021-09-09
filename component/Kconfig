@@ -1,0 +1,9 @@
+menu "MCU SFW Component"
+
+source "$SFW_DIR/component/flashiap/Kconfig"
+
+source "$SFW_DIR/component/secure/Kconfig"
+
+source "$SFW_DIR/component/serial_manager/Kconfig"
+
+endmenu

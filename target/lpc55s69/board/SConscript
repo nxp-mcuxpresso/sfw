@@ -1,0 +1,77 @@
+Import('sfwprofile')
+from building import *
+
+cwd = GetCurrentDir()
+
+# Defines for OTA flash address
+config_start = "BOOT_FLASH_ACT_APP=" + GetConfigValue('BOOT_FLASH_ACT_APP')
+config_end = "BOOT_FLASH_CAND_APP=" + GetConfigValue('BOOT_FLASH_CAND_APP')
+
+# add the general drivers.
+src = Split("""
+board.c
+iap_flash_ops.c
+MCUX_Config/clock_config.c
+MCUX_Config/pin_mux.c
+
+""")
+
+sd_fs_src = Split("""
+sdcard_ota.c
+sdmmc_config.c
+""")
+
+udisk_fs_src = Split("""
+udisk_ota.c
+""")
+
+CPPPATH = [cwd,cwd + '/MCUX_Config']
+
+CPPDEFINES = ['CPU_LPC55S69JBD100_cm33_core0', 'STD=C99', 'SKIP_SYSCLK_INIT', 'FSL_SDK_ENABLE_DRIVER_CACHE_CONTROL', 'USB_STACK_FREERTOS']
+
+if GetDepend(['SFW_RTOS_FREERTOS']):
+    CPPDEFINES += ['FSL_RTOS_FREE_RTOS']
+    
+if GetDepend(['SFW_STANDALONE_XIP']):
+    CPPDEFINES += ['XIP_BOOT_HEADER_ENABLE=1']
+else:
+    CPPDEFINES += ['XIP_BOOT_HEADER_ENABLE=0']
+
+if GetDepend(['BOARD_SDRAM']):
+    CPPDEFINES += ['XIP_BOOT_HEADER_DCD_ENABLE=1']
+
+if GetDepend(['COMPONENT_SDMMC']):
+    src = src +  sd_fs_src
+    CPPDEFINES += ['SD_ENABLED', 'SD_DISK_ENABLE']
+
+if GetDepend(['COMPONENT_USB']):
+    src = src +  udisk_fs_src
+    CPPDEFINES += ['USB_DISK_ENABLE', 'USB_STACK_FREERTOS']
+
+# Add linker defines for keil
+if sfwprofile.CROSS_TOOL == 'keil':
+    CPPDEFINES.append('__FPU_PRESENT=1')
+    LINKFLAGS = '../device/LPC55S69/arm/keil_lib_power_cm33_core0.lib --remove\r\n'
+    if GetDepend(['SFW_STANDALONE_XIP']):
+        LINKFLAGS += '--predefine="-DSFW_STANDALONE_XIP=1"'
+    else:
+        LINKFLAGS += '--predefine="-DSFW_STANDALONE_XIP=0"\r\n'
+        LINKFLAGS += '--predefine="-D' + config_start + '"\r\n'
+        LINKFLAGS += '--predefine="-D' + config_end + '"'
+    group = DefineGroup('board', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES=CPPDEFINES, LINKFLAGS = LINKFLAGS)
+# Add linker defines for IAR
+elif sfwprofile.CROSS_TOOL == 'iar':
+    if GetDepend(['SFW_STANDALONE_XIP']):
+        LINKDEFINES = ['SFW_STANDALONE_XIP=1']
+    else:
+        LINKDEFINES = ['SFW_STANDALONE_XIP=0']
+        LINKDEFINES += [config_start]
+        LINKDEFINES += [config_end]
+    group = DefineGroup('board', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES=CPPDEFINES, LINKDEFINES = LINKDEFINES)
+elif sfwprofile.CROSS_TOOL == 'gcc':
+    LIBS = ['power_hardabi']
+    cwd = GetCurrentDir()
+    LIBPATH = [cwd + '/../device/LPC55S69/gcc']
+    group = DefineGroup('board', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES=CPPDEFINES, LIBS=LIBS, LIBPATH=LIBPATH)
+
+Return('group')

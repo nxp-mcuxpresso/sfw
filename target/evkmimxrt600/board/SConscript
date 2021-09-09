@@ -1,0 +1,67 @@
+Import('sfwprofile')
+from building import *
+
+cwd = GetCurrentDir()
+
+# add the general drivers.
+src = Split("""
+board.c
+MCUX_Config/clock_config.c
+MCUX_Config/pin_mux.c
+flexspi_octal_flash_ops.c
+""")
+
+sd_fs_src = Split("""
+sdcard_ota.c
+sdmmc_config.c
+fsl_pca9420.c
+""")
+
+udisk_fs_src = Split("""
+udisk_ota.c
+""")
+
+CPPPATH = [cwd,cwd + '/MCUX_Config']
+
+CPPDEFINES = ['CPU_MIMXRT685SFVKB_cm33', 'STD=C99', 'FSL_SDK_DRIVER_QUICK_ACCESS_ENABLE=1']
+
+if GetDepend(['SFW_RTOS_FREERTOS']):
+    CPPDEFINES += ['FSL_RTOS_FREE_RTOS']
+
+if GetDepend(['SFW_STANDALONE_XIP']):
+    CPPDEFINES += ['BOOT_HEADER_ENABLE=1']
+else:
+    CPPDEFINES += ['BOOT_HEADER_ENABLE=0']
+
+if GetDepend(['COMPONENT_SDMMC']):
+    src = src +  sd_fs_src
+    CPPDEFINES += ['SD_ENABLED', 'SD_DISK_ENABLE', 'SDK_I2C_BASED_COMPONENT_USED']
+
+if GetDepend(['COMPONENT_USB']):
+    src = src +  udisk_fs_src
+    CPPDEFINES += ['USB_DISK_ENABLE', 'USB_STACK_FREERTOS']
+
+if sfwprofile.CROSS_TOOL == 'keil':
+    CPPDEFINES.append('__FPU_PRESENT=1')
+    LIBS = ['keil_lib_power']
+    cwd = GetCurrentDir()
+    LIBPATH = [cwd + '/../device/MIMXRT685S/arm']
+    group = DefineGroup('board', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES=CPPDEFINES, LIBS=LIBS, LIBPATH=LIBPATH)
+elif sfwprofile.CROSS_TOOL == 'gcc':
+    LIBS = ['libpower_hardabi']
+    cwd = GetCurrentDir()
+    LIBPATH = [cwd + '/../device/MIMXRT685S/gcc']
+    group = DefineGroup('board', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES=CPPDEFINES, LIBS=LIBS, LIBPATH=LIBPATH)
+else: 
+    LIBS = ['iar_lib_power']
+    cwd = GetCurrentDir()
+    LIBPATH = [cwd + '/../device/MIMXRT685S/iar']
+    group = DefineGroup('board', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES=CPPDEFINES, LIBS=LIBS, LIBPATH=LIBPATH)
+
+list = os.listdir(cwd)
+
+for item in list:
+    if os.path.isfile(os.path.join(cwd, item, 'SConscript')):
+        group = group + SConscript(os.path.join(item, 'SConscript'))
+
+Return('group')

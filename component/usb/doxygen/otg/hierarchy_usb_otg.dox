@@ -1,0 +1,29 @@
+/*!
+@defgroup usb_otg_drv USB OTG driver
+@{
+*/
+
+/*!
+@defgroup usb_otg_controller_driver USB OTG Controller driver
+@ingroup usb_otg_drv
+*/
+
+/*!
+@defgroup usb_otg_peripheral_driver USB OTG Peripheral driver
+@ingroup usb_otg_drv
+*/
+
+/*! @} */
+
+/*!
+@defgroup usb_os_component_abstraction USB OS Adapter
+@details Please reference to MCUXpresso SDK API Reference Manual.
+*/
+
+/*!
+@defgroup usb_drv Definitions and structures 
+@details This lists the common definitions and structures for USB stack.
+@{
+*/
+
+/*! @} */

@@ -1,0 +1,140 @@
+menu "MCU SFW core"
+		
+config SFW_STANDALONE_XIP
+    bool "Enable sfw standalone xip"
+    default n
+    help
+        If enable, the SFW image can run in XIP separately.
+        If disable, the SFW image must be used in conjunction with SBL.
+
+config SFW_RTOS_FREERTOS
+    bool
+    default y
+
+config OTA_SUPPORT
+    bool "Enable OTA"
+    default n
+
+if OTA_SUPPORT
+
+    if !(SOC_IMXRT1010_SERIES || SOC_LPC55S69_SERIES || SOC_IMXRT500_SERIES || SOC_IMXRT600_SERIES)
+        config OTA_CLOUD
+	        bool "OTA from cloud"
+		    default n
+
+	    if OTA_CLOUD
+            choice
+                prompt "OTA Cloud Select"
+                default OTA_ALIYUN
+
+                config OTA_ALIYUN
+                    bool "Aliyun"
+
+                config OTA_AWS
+                    bool "AWS"
+            endchoice
+
+            if OTA_AWS
+                menu "AWS Config"
+                    config MQTT_BROKER_ENDPOINT
+                        string "Set MQTT broker DNS name"
+                        default ""
+
+                    config IOT_THING_NAME
+                        string "Set IoT Thing name"
+                        default ""
+                endmenu
+            endif
+
+            if OTA_ALIYUN
+                menu "Aliyun Config"
+                    config PRODUCT_KEY
+                        string "Set product key"
+                        default ""
+
+                    config DEVICE_NAME
+                        string "Set device name"
+                        default ""
+
+                    config DEVICE_SECRET
+                        string "Set device secret"
+                        default ""
+                endmenu
+            endif
+        endif
+    endif
+
+    if !(SOC_IMXRT1010_SERIES)
+        config OTA_SDCARD
+            bool "OTA from sdcard"
+            default y
+		    select COMPONENT_FS
+		    select COMPONENT_SDMMC
+		    select COMPONENT_OSA
+
+        config COMPONENT_SDMMC
+            bool
+		    select SOC_GPIO
+    endif
+
+    config OTA_UDISK
+        bool "OTA from u-disk"
+		default n
+		select COMPONENT_FS
+		select COMPONENT_USB
+		select COMPONENT_OSA
+
+    config COMPONENT_FS
+        bool
+
+    config COMPONENT_USB
+        bool
+
+    config COMPONENT_OSA
+        bool
+
+endif
+
+menu "MCU SFW Flash Map"
+
+config BOOT_FLASH_BASE
+    hex "Flash base address"
+    default 0x60000000
+    help
+        The base address of the flash.
+
+config BOOT_FLASH_HEADER
+    hex "Metadata header address"
+    default 0x60010000
+    help
+        The metadata header address.
+
+config BOOT_FLASH_ACT_APP
+    hex "Active APP start address"
+    default 0x60100000
+    help
+        The active application start address.
+
+config BOOT_FLASH_CAND_APP
+    hex "Candidate APP start address"
+    default 0x60200000
+    help
+        The candidate application start address.
+
+config BOOT_FLASH_CUSTOMER
+    hex "Customer space start address"
+    default 0x603f0000
+    help
+        The customer space start address.
+endmenu
+
+menu "MCU SFW metadata header"
+
+    config BOOT_METADATA
+        bool "Enable metadata header configuration"
+        default y
+        help
+            Customize the metadata header.
+endmenu
+
+endmenu

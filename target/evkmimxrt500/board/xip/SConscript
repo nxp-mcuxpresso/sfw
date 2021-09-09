@@ -1,0 +1,42 @@
+Import('sfwprofile')
+from building import *
+
+group = []
+
+# Defines for OTA flash address
+config_start = "BOOT_FLASH_ACT_APP=" + GetConfigValue('BOOT_FLASH_ACT_APP')
+config_end = "BOOT_FLASH_CAND_APP=" + GetConfigValue('BOOT_FLASH_CAND_APP')
+
+if GetDepend('BOARD_FLASH_SUPPORT'):
+    cwd = GetCurrentDir()
+    src = Glob('*.c')
+    CPPPATH = [cwd]
+    
+    # Add linker defines for keil
+    if sfwprofile.CROSS_TOOL == 'keil':
+        LINKFLAGS  = ' --remove'
+        LINKFLAGS += ' --keep=*(CodeQuickAccess)'
+        if GetDepend(['SFW_STANDALONE_XIP']):
+            LINKFLAGS += ' --keep=*(.flash_conf)' 
+            LINKFLAGS += ' --predefine="-DBOOT_HEADER_ENABLE=1"'
+        else:
+            LINKFLAGS += ' --predefine="-DBOOT_HEADER_ENABLE=0"'
+            LINKFLAGS += ' --predefine="-D' + config_start + '"\r\n'
+            LINKFLAGS += ' --predefine="-D' + config_end + '"'
+        LINKDEFINES = []
+    # Add linker defines for IAR
+    elif sfwprofile.CROSS_TOOL == 'iar':
+        if GetDepend(['SFW_STANDALONE_XIP']):
+            LINKDEFINES = ['BOOT_HEADER_ENABLE=1']
+        else:
+            LINKDEFINES = ['BOOT_HEADER_ENABLE=0']
+            LINKDEFINES += [config_start]
+            LINKDEFINES += [config_end]
+        LINKFLAGS = ''
+    elif sfwprofile.CROSS_TOOL == 'gcc':
+        LINKFLAGS = ''
+        LINKDEFINES = []
+
+    group = DefineGroup('xip', src, depend = [''], CPPPATH = CPPPATH, LINKFLAGS = LINKFLAGS, LINKDEFINES=LINKDEFINES)
+
+Return('group')

@@ -1,0 +1,19 @@
+Import('sfwprofile')
+from building import *
+
+# The set of source files associated with this SConscript file.
+src = ['mdio/enet/fsl_enet_mdio.c']
+
+cwd = GetCurrentDir()
+CPPPATH = [cwd, cwd + "/mdio/enet"]
+
+if GetDepend(['SOC_IMXRT1170_SERIES']):
+    src += ['device/phyrtl8211f/fsl_phyrtl8211f.c']
+    CPPPATH += [cwd + "/device/phyrtl8211f"]
+else:
+    src += ['device/phyksz8081/fsl_phyksz8081.c']
+    CPPPATH += [cwd + "/device/phyksz8081"]
+
+group = DefineGroup('enet_phy', src, depend = ['COMPONENT_PHY'], CPPPATH = CPPPATH)
+
+Return('group')

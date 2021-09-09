@@ -1,0 +1,32 @@
+from building import *
+
+# The set of source files associated with this SConscript file.
+src = Split('''
+source/diskio.c
+source/ff.c
+source/ffsystem.c
+source/ffunicode.c
+''')
+
+sd_fs_src = Split("""
+source/fsl_sd_disk/fsl_sd_disk.c
+""")
+
+usb_fs_src = Split("""
+source/fsl_usb_disk/fsl_usb_disk_freertos.c
+""")
+
+cwd = GetCurrentDir()
+CPPPATH = [cwd, cwd + "/source"]
+
+if GetDepend(['COMPONENT_SDMMC']):
+    src = src +  sd_fs_src
+    CPPPATH +=[cwd + "/source/fsl_sd_disk"]
+
+if GetDepend(['COMPONENT_USB']):
+    src = src +  usb_fs_src
+    CPPPATH +=[cwd + "/source/fsl_usb_disk"]
+
+group = DefineGroup('fatfs', src, depend = ['COMPONENT_FS'], CPPPATH = CPPPATH)
+
+Return('group')

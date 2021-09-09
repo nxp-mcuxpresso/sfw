@@ -1,0 +1,20 @@
+- path: middleware/usb/script/post_release_new.rb
+  parameters:
+  - sdk_root
+  - board_name
+  condition: stage1
+- path: middleware/usb/script/post_release_new_rndis.rb
+  parameters:
+  - sdk_root
+  - board_name
+  condition: stage1
+- path: middleware/usb/script/post_release_new.rb
+  parameters:
+  - sdk_root
+  - usb_version
+  condition: post_stage1
+- path: middleware/usb/script/post_release_pd.rb
+  parameters:
+  - sdk_root
+  - board_name
+  condition: stage1

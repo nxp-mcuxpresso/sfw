@@ -1,0 +1,24 @@
+# for module compiling
+import os
+from building import *
+
+cwd = GetCurrentDir()
+
+src = []
+CPPPATH = [cwd]
+CPPDEFINES = []
+
+if GetDepend(['COMPONENT_MCU_ISP']):
+    CPPDEFINES += ['USB_STACK_BM']
+    CPPDEFINES += ['USB_STACK_USE_DEDICATED_RAM=1']
+
+objs = DefineGroup('board', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES=CPPDEFINES)
+
+list = os.listdir(cwd)
+
+for d in list:
+    path = os.path.join(cwd, d)
+    if os.path.isfile(os.path.join(path, 'SConscript')):
+        objs = objs + SConscript(os.path.join(d, 'SConscript'))
+
+Return('objs')

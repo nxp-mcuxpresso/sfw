@@ -1,0 +1,68 @@
+from building import *
+
+cwd = GetCurrentDir()
+
+# add the general drivers.
+src = Glob('*.c')
+src += Glob('demos/demo_runner/*.c')
+src += Glob('demos/dev_mode_key_provisioning/src/*.c')
+src += Glob('demos/network_manager/*.c')
+src += Glob('demos/ota/*.c')
+src += Glob('libraries/3rdparty/http_parser/*.c')
+src += Glob('libraries/3rdparty/jsmn/*.c')
+src += Glob('libraries/3rdparty/mbedtls/utils/*.c')
+src += Glob('libraries/3rdparty/tinycbor/*.c')
+src += Glob('libraries/abstractions/pkcs11/mbedtls/*.c')
+src += Glob('libraries/abstractions/platform/freertos/*.c')
+src += Glob('libraries/c_sdk/aws/shadow/src/*.c')
+src += Glob('libraries/c_sdk/standard/common/logging/*.c')
+src += Glob('libraries/c_sdk/standard/common/taskpool/*.c')
+src += Glob('libraries/c_sdk/standard/common/*.c')
+src += Glob('libraries/c_sdk/standard/https/src/*.c')
+src += Glob('libraries/c_sdk/standard/mqtt/src/*.c')
+src += Glob('libraries/c_sdk/standard/serializer/src/*.c')
+src += Glob('libraries/c_sdk/standard/serializer/src/json/*.c')
+src += Glob('libraries/freertos_plus/aws/ota/src/*.c')
+src += Glob('libraries/freertos_plus/aws/ota/src/mqtt/*.c')
+src += Glob('libraries/freertos_plus/aws/ota/src/http/*.c')
+src += Glob('libraries/freertos_plus/standard/crypto/src/*.c')
+src += Glob('libraries/freertos_plus/standard/pkcs11/src/*.c')
+src += Glob('libraries/freertos_plus/standard/tls/src/*.c')
+src += Glob('libraries/freertos_plus/standard/utils/src/*.c')
+src += Glob('vendors/nxp/pkcs11/common/*.c')
+src += Glob('vendors/nxp/secure_sockets/lwip/*.c')
+
+
+CPPPATH = [cwd, 
+           cwd + '/config_files',
+           cwd + '/demos/dev_mode_key_provisioning/include',
+           cwd + '/demos/include',
+           cwd + '/demos/network_manager',
+           cwd + '/libraries/3rdparty/http_parser',
+           cwd + '/libraries/3rdparty/jsmn',
+           cwd + '/libraries/3rdparty/pkcs11',
+           cwd + '/libraries/3rdparty/tinycbor',
+           cwd + '/libraries/abstractions/pkcs11/include',
+           cwd + '/libraries/abstractions/pkcs11/mbedtls',
+           cwd + '/libraries/abstractions/platform/freertos/include',
+           cwd + '/libraries/abstractions/platform/include',
+           cwd + '/libraries/abstractions/secure_sockets/include',
+           cwd + '/libraries/c_sdk/aws/shadow/include',
+           cwd + '/libraries/c_sdk/aws/shadow/src',
+           cwd + '/libraries/c_sdk/standard/common/include',
+           cwd + '/libraries/c_sdk/standard/common/include/private',
+           cwd + '/libraries/c_sdk/standard/mqtt/include',
+           cwd + '/libraries/c_sdk/standard/mqtt/src',
+           cwd + '/libraries/c_sdk/standard/serializer/include',
+           cwd + '/libraries/c_sdk/standard/https/include',
+           cwd + '/libraries/freertos_plus/aws/ota/src',
+           cwd + '/libraries/freertos_plus/aws/ota/include',
+           cwd + '/libraries/freertos_plus/standard/crypto/include',
+           cwd + '/libraries/freertos_plus/standard/pkcs11/include',
+           cwd + '/libraries/freertos_plus/standard/tls/include',
+           cwd + '/libraries/freertos_plus/standard/utils/include']
+
+
+group = DefineGroup('aws_ota', src, depend = ['OTA_AWS'], CPPPATH = CPPPATH)
+
+Return('group')

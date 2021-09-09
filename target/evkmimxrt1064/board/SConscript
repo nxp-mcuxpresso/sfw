@@ -1,0 +1,71 @@
+Import('SFW_ROOT')
+Import('sfwprofile')
+from building import *
+
+cwd = GetCurrentDir()
+
+# add the general drivers.
+src = Split("""
+board.c
+MCUX_Config/clock_config.c
+MCUX_Config/pin_mux.c
+flexspi_nor_flash_ops.c
+""")
+
+sd_fs_src = Split("""
+sdcard_ota.c
+sdmmc_config.c
+""")
+
+udisk_fs_src = Split("""
+udisk_ota.c
+""")
+
+aws_src = Split("""
+mflash_drv.c
+""")
+
+CPPPATH = [cwd,cwd + '/MCUX_Config']
+
+CPPDEFINES = ['CPU_MIMXRT1064DVL6A', 'STD=C99', 'SKIP_SYSCLK_INIT', 'EVK_MCIMXRM', 'FSL_SDK_ENABLE_DRIVER_CACHE_CONTROL','XIP_EXTERNAL_FLASH=1']
+
+if GetDepend(['SFW_RTOS_FREERTOS']):
+    CPPDEFINES += ['FSL_RTOS_FREE_RTOS', 'USE_RTOS=1']
+
+if GetDepend(['SFW_STANDALONE_XIP']):
+    CPPDEFINES += ['XIP_BOOT_HEADER_ENABLE=1']
+else:
+    CPPDEFINES += ['XIP_BOOT_HEADER_ENABLE=0']
+
+if GetDepend(['BOARD_SDRAM']):
+    CPPDEFINES += ['XIP_BOOT_HEADER_DCD_ENABLE=1']
+
+if GetDepend(['COMPONENT_SDMMC']):
+    src = src +  sd_fs_src
+    CPPDEFINES += ['SD_ENABLED', 'SD_DISK_ENABLE']
+
+if GetDepend(['COMPONENT_USB']):
+    src = src +  udisk_fs_src
+    CPPDEFINES += ['USB_DISK_ENABLE', 'USB_STACK_FREERTOS']
+
+if GetDepend(['COMPONENT_PHY']):
+    CPPDEFINES += ['FSL_FEATURE_PHYKSZ8081_USE_RMII50M_MODE']
+
+if GetDepend(['OTA_AWS']):
+    src += [SFW_ROOT + '/firmware/aws_ota/vendors/nxp/ota/aws_ota_pal.c']
+    src = src +  aws_src
+    if sfwprofile.CROSS_TOOL == 'iar':
+        CPPDEFINES += ['FILE=void']
+
+if sfwprofile.CROSS_TOOL == 'keil':
+    CPPDEFINES.append('__FPU_PRESENT=1')
+    
+group = DefineGroup('board', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES=CPPDEFINES)
+
+list = os.listdir(cwd)
+
+for item in list:
+    if os.path.isfile(os.path.join(cwd, item, 'SConscript')):
+        group = group + SConscript(os.path.join(item, 'SConscript'))
+
+Return('group')

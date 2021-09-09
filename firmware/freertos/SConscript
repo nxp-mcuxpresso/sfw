@@ -1,0 +1,33 @@
+Import('sfwprofile')
+from building import *
+
+cwd = GetCurrentDir()
+
+# add the general drivers.
+src = Glob('freertos_kernel/*.c')
+
+CPPPATH = [cwd, cwd + '/freertos_kernel/include']
+
+src += ['freertos_kernel/portable/MemMang/heap_4.c']
+
+if GetDepend(['SOC_IMXRTYYYY_SERIES']):
+    if  sfwprofile.CROSS_TOOL == 'iar':
+        src += ['freertos_kernel/portable/IAR/ARM_CM4F/port.c']
+        src += ['freertos_kernel/portable/IAR/ARM_CM4F/portasm.s']
+        CPPPATH += [cwd + '/freertos_kernel/portable/IAR/ARM_CM4F']
+    else:
+        src += ['freertos_kernel/portable/GCC/ARM_CM4F/port.c']
+        CPPPATH += [cwd + '/freertos_kernel/portable/GCC/ARM_CM4F']
+else:
+    if  sfwprofile.CROSS_TOOL == 'iar':
+        src += ['freertos_kernel/portable/IAR/ARM_CM33_NTZ/non_secure/port.c']
+        src += ['freertos_kernel/portable/IAR/ARM_CM33_NTZ/non_secure/portasm.s']
+        CPPPATH += [cwd + '/freertos_kernel/portable/IAR/ARM_CM33_NTZ/non_secure']
+    else:
+        src += ['freertos_kernel/portable/GCC/ARM_CM33_NTZ/non_secure/port.c']
+        src += ['freertos_kernel/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.c']
+        CPPPATH += [cwd + '/freertos_kernel/portable/GCC/ARM_CM33_NTZ/non_secure']
+
+group = DefineGroup('freertos_kernel', src, depend = ['SFW_RTOS_FREERTOS'], CPPPATH = CPPPATH)
+
+Return('group')

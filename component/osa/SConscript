@@ -1,0 +1,9 @@
+from building import *
+
+cwd = GetCurrentDir()
+src = Glob('*.c')
+CPPPATH = [cwd]
+
+group = DefineGroup('osa', src, depend = ['COMPONENT_OSA'], CPPPATH = CPPPATH)
+
+Return('group')

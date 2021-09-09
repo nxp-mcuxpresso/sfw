@@ -1,0 +1,16 @@
+from building import *
+
+# The set of source files associated with this SConscript file.
+cwd = GetCurrentDir()
+
+# add the common files.
+src = []
+
+CPPPATH = [cwd]
+
+if GetDepend(['CONFIG_BOOT_ENCRYPTED_XIP']):
+	src += ['./update_key_context.c']
+
+group = DefineGroup('semifunc', src, depend = ['CONFIG_BOOT_ENCRYPTED_XIP'], CPPPATH = CPPPATH)
+
+Return('group')
