@@ -36,6 +36,9 @@
 #include "task.h"
 #include "timers.h"
 #include "sbl_ota_flag.h"
+#if defined(CONFIG_BOOT_ENCRYPTED_XIP)
+#include "update_key_context.h"
+#endif
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
@@ -498,8 +501,11 @@ status_t DEMO_SDCardOTAUpgrade(void)
     
     write_update_type(UPDATE_TYPE_SDCARD);
     enable_image();
+#if defined(CONFIG_BOOT_ENCRYPTED_XIP)
+    update_key_context();
+#endif
     //taskEXIT_CRITICAL();
-      
+
     PRINTF("Please remove the SD Card!\r\n");
     PRINTF("sys rst...\r\n\r\n");
     vTaskDelay(5000U);

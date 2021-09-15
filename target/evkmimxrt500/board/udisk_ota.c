@@ -33,6 +33,9 @@
 #include "flexspi_flash.h"
 #include "image.h"
 #include "sbl_ota_flag.h"
+#if defined(CONFIG_BOOT_ENCRYPTED_XIP)
+#include "update_key_context.h"
+#endif
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
@@ -346,6 +349,9 @@ usb_status_t USB_DiskUpgrade(usb_host_msd_fatfs_instance_t *msdFatfsInstance)
 
     write_update_type(UPDATE_TYPE_UDISK);
     enable_image();
+#if defined(CONFIG_BOOT_ENCRYPTED_XIP)
+    update_key_context();
+#endif
     
     usb_echo("Please unplug the u-disk!\r\n");
     usb_echo("sys rst...\r\n\r\n");

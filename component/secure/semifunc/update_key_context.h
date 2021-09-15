@@ -22,6 +22,10 @@
 #   define REMAPADDRSTART  (0x400AC078)
 #   elif defined(SOC_IMXRT1010_SERIES)
 #   define REMAPADDRSTART  (0x400AC06C)
+#   elif defined(SOC_IMXRT600_SERIES)
+#   define REMAPADDRSTART   (FLEXSPI_BASE + 0x420)
+#   elif defined(SOC_IMXRT500_SERIES)
+#   define REMAPADDRSTART   (FLEXSPI0_BASE + 0x420)
 #   else
 #   error "Doesn't define REMAPADDRSTART"
 #   endif
@@ -34,7 +38,8 @@
 /* Assume that user encrypt SBL, copy new key inormation to second context,
  * or user should change the offset of key context
  */
-#if defined(SOC_IMXRT1170_SERIES) || defined(SOC_IMXRT1010_SERIES)
+#if defined(SOC_IMXRT1170_SERIES) || defined(SOC_IMXRT1010_SERIES)  || \
+    defined(SOC_IMXRTXXX_SERIES)
 #define KEY_CONTEXT2_OFFSET_IN_BOOTIMAGE    (0x40u)
 #define KEY_CONTEXT_SIZE                    (0x40u)
 #elif defined(SOC_IMXRT1060_SERIES) || defined(SOC_IMXRT1050_SERIES) || \
