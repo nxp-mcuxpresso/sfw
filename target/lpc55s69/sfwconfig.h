@@ -35,9 +35,6 @@
 #define BOOT_FLASH_CAND_APP 0x00050000
 #define BOOT_FLASH_CUSTOMER 0x00080000
 
-/* MCU SFW metadata header */
-
-
 /* MCU SFW Component */
 
 /* Flash IAP */
