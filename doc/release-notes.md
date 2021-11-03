@@ -1,5 +1,13 @@
 # MCU-OTA SFW Release Notes
 
+## --- Version 1.1.0
+
+### What's new
+
+- Enable XIP encryption on evkmimxrt500 and evkmimxrt600
+- Fix some bugs
+
+
 ## --- Version 1.0
 
 ### What's new
